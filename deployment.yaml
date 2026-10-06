@@ -1,9 +1,9 @@
-# The React UI (frontend-react/), served as static files by nginx.
+# The React UI (the ai-scanner-frontend repository), served as static files by nginx.
 # It holds no secrets and no state; it only talks to the gateway, through the
 # same address (the Ingress sends the gateway's paths to the gateway).
 #
-# Apply through the kustomization (kubectl apply -k k8s/): the image TAG is set
-# in k8s/kustomization.yaml.
+# Apply through ai-scanner-backend-deployment (kubectl apply -k . there): the
+# image TAG is set in that repository's kustomization.yaml.
 ---
 apiVersion: apps/v1                               # apps API group, where Deployment is defined
 kind: Deployment                                  # keeps N identical Pods running and replaces them on change
@@ -29,7 +29,7 @@ spec:                                             # desired state
           type: RuntimeDefault                    # the container runtime's default filter ("restricted" requires one)
       containers:                                 # the containers in the Pod
         - name: frontend                          # container name
-          image: review-frontend                  # image NAME only (built with: docker build -t review-frontend frontend-react/); the tag comes from kustomization.yaml
+          image: review-frontend                  # image NAME only (built from the ai-scanner-frontend repository); the tag comes from kustomization.yaml
           imagePullPolicy: IfNotPresent           # use the image already on the node (imported with k3s ctr); only pull if it is missing
           ports:                                  # ports the container listens on
             - containerPort: 8080                 # nginx-unprivileged listens on 8080 (a non-root user cannot bind port 80)
@@ -50,7 +50,7 @@ spec:                                             # desired state
               mountPath: /tmp                     # nginx-unprivileged keeps its pid file and temp buffers in /tmp
           livenessProbe:                          # "is it still alive, or should it be restarted?"
             httpGet:                              # an HTTP GET; any 2xx/3xx answer = healthy
-              path: /healthz                      # answered by nginx itself (frontend-react/nginx/default.conf)
+              path: /healthz                      # answered by nginx itself (nginx/default.conf in ai-scanner-frontend)
               port: 8080                          # the container port above
             initialDelaySeconds: 3                # wait 3 s after start before the first check
             periodSeconds: 15                     # then check every 15 s
