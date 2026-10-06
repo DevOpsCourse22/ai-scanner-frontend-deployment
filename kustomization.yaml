@@ -1,13 +1,14 @@
-# The React UI's Kubernetes objects, as one Kustomize unit.
+# The React UI's Kubernetes objects, as one Kustomize unit, complete on its own.
 #
-# Normally applied TOGETHER with the rest of the app, from the
-# ai-scanner-backend-deployment repository cloned next to this one:
+#   kubectl kustomize .     print exactly what would be applied (changes nothing)
 #
-#   cd ai-scanner-backend-deployment && kubectl apply -k .
+# Deployed by the Argo CD Application "ai-scan-frontend", which points at this
+# repository (path ".", branch main). Argo CD clones ONE repository per
+# Application, so nothing here may refer to another repository (no ../).
+# Change the cluster by committing here; Argo CD applies the commit.
 #
-# That kustomization lists this folder (../ai-scanner-frontend-deployment) as
-# one of its resources and sets the image tag for review-frontend there, so
-# this file has no images: block of its own (one place to set every tag).
+# Needs the ai-scan-repos namespace and the Ingress that routes to it, both
+# from ai-scanner-backend-deployment.
 #
 # Before the split this was Code-Review-MCP/k8s/frontend/ inside
 # hadsahar/DevSecOps-Final-Project.
@@ -16,3 +17,7 @@ kind: Kustomization                               # this file describes a set of
 
 resources:                                        # the files that make up the UI
   - deployment.yaml                               # the React UI (nginx, uid 101), Deployment and Service
+
+images:                                           # rewrite image references in the manifests above
+  - name: review-frontend                         # every "image: review-frontend" ...
+    newTag: e74fbb1                               # ... becomes review-frontend:e74fbb1. The tag you built from ai-scanner-frontend and imported into K3s
