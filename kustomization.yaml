@@ -20,4 +20,5 @@ resources:                                        # the files that make up the U
 
 images:                                           # rewrite image references in the manifests above
   - name: review-frontend                         # every "image: review-frontend" ...
-    newTag: e74fbb1                               # ... becomes review-frontend:e74fbb1. The tag you built from ai-scanner-frontend and imported into K3s
+    newName: 10.0.0.39:30500/review-frontend                    # set by Jenkins: the registry it was pushed to
+    newTag: f6b7954                               # set by Jenkins: the commit it was built from
